@@ -20,7 +20,7 @@ EXPECTED_COLUMNS = [
 ]
 
 EXPECTED_COUNTRIES = {
-    "China", "USA", "Germany", "UK", "France", "Norway", "India", "Netherlands"
+    "China", "USA", "Germany", "United Kingdom", "France", "Norway", "India", "Netherlands"
 }
 
 
@@ -66,7 +66,7 @@ def validate(staged_path=STAGED_PATH, report_path=REPORT_PATH):
         "max_year": max_year,
     }
 
-    # 6. Distribution summary (informational)
+    # 6. Distribution summary
     report["checks"]["units_sold_stats"] = df["units_sold"].describe().to_dict()
 
     # Overall result

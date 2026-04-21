@@ -1,0 +1,74 @@
+schema: '2.0'
+stages:
+  ingest:
+    cmd: python src/data_ingest.py
+    deps:
+    - path: data/raw/ev_demand_dataset.csv
+      hash: md5
+      md5: 256c8e1917101c72526b4f8b3deea76f
+      size: 74668
+    - path: src/data_ingest.py
+      hash: md5
+      md5: 2667871931b2c3c579d8482d09e96502
+      size: 1589
+    outs:
+    - path: data/staged/data.csv
+      hash: md5
+      md5: 7ec04274b025cd95a984c308dfb81d9c
+      size: 50592
+  validate:
+    cmd: python src/data_validation.py
+    deps:
+    - path: data/staged/data.csv
+      hash: md5
+      md5: 7ec04274b025cd95a984c308dfb81d9c
+      size: 50592
+    - path: src/data_validation.py
+      hash: md5
+      md5: c484b23a85bfb00c25ca1b7252428de8
+      size: 2901
+    outs:
+    - path: data/staged/validation_report.json
+      hash: md5
+      md5: dd3e805e020cf0ede8f5511f852fba94
+      size: 1218
+  train:
+    cmd: python src/train_and_tune.py
+    deps:
+    - path: data/staged/data.csv
+      hash: md5
+      md5: 7ec04274b025cd95a984c308dfb81d9c
+      size: 50592
+    - path: src/train_and_tune.py
+      hash: md5
+      md5: 9e9318e4b490fd3cac60000926efd7d4
+      size: 4557
+    outs:
+    - path: models/best_params.json
+      hash: md5
+      md5: 0314da200c86b1f2b45b0521777cf92c
+      size: 175
+    - path: models/model.pkl
+      hash: md5
+      md5: 0a64277213e950bbfd37a93b51071109
+      size: 1265178
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+    - path: data/staged/data.csv
+      hash: md5
+      md5: 7ec04274b025cd95a984c308dfb81d9c
+      size: 50592
+    - path: models/model.pkl
+      hash: md5
+      md5: 0a64277213e950bbfd37a93b51071109
+      size: 1265178
+    - path: src/evaluate.py
+      hash: md5
+      md5: 98d952fd88aca426e901116f8cf5973f
+      size: 2169
+    outs:
+    - path: models/metrics.json
+      hash: md5
+      md5: 9dfe13e10b52f1d49f0e59fcac046c51
+      size: 790
