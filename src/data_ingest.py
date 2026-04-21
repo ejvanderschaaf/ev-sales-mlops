@@ -31,7 +31,7 @@ def ingest(raw_path=RAW_PATH, staged_path=STAGED_PATH):
         df.groupby(["country", "brand"])[charger_cols].ffill().bfill()
     )
 
-    # Impute lag3/lag12/rolling3 NaNs with 0 (series start; documented decision)
+    # Impute lag3/lag12/rolling3 NaNs with 0 (series start)
     impute_cols = ["units_sold_lag3", "units_sold_lag12", "units_sold_rolling3"]
     df[impute_cols] = df[impute_cols].fillna(0)
 

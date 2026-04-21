@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from src.data_ingest import ingest
 from src.data_validation import validate
 
-# ── Minimal synthetic data ────────────────────────────────────────────────────
+#  Minimal synthetic data
 
 SAMPLE_DATA = {
     "country": ["China"] * 4 + ["USA"] * 4,
@@ -54,7 +54,7 @@ def tmp_raw(tmp_path):
     return tmp_path
 
 
-# ── Ingest tests ──────────────────────────────────────────────────────────────
+#  Ingest tests
 
 def test_ingest_returns_dataframe(tmp_raw):
     df = ingest(
@@ -100,7 +100,7 @@ def test_ingest_saves_csv(tmp_raw):
     assert os.path.exists(staged_path)
 
 
-# ── Validation tests ──────────────────────────────────────────────────────────
+#  Validation tests
 
 def test_validation_passes_on_clean_data(tmp_raw):
     staged_path = str(tmp_raw / "data/staged/data.csv")
