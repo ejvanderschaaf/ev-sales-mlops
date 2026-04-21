@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches-ignore:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint-test-sanity:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Lint with flake8
+        run: flake8 src/ inference/ tests/ --max-line-length=100
+
+      - name: Run unit tests
+        run: pytest tests/ -v
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - name: Configure DVC remote
+        run: dvc remote add -d myremote s3://ev-sales-mlops/dvc-store --force
+
+      - name: Pull raw data from DVC remote
+        run: dvc pull data/raw/ev_demand_dataset.csv
+
+      - name: Sanity ingest + validate + train
+        run: |
+          python src/data_ingest.py
+          python src/data_validation.py
+          python src/train_and_tune.py --sanity

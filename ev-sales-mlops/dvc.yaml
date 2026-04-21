@@ -1,0 +1,34 @@
+stages:
+  ingest:
+    cmd: python src/data_ingest.py
+    deps:
+      - src/data_ingest.py
+      - data/raw/ev_demand_dataset.csv
+    outs:
+      - data/staged/data.csv
+
+  validate:
+    cmd: python src/data_validation.py
+    deps:
+      - src/data_validation.py
+      - data/staged/data.csv
+    outs:
+      - data/staged/validation_report.json
+
+  train:
+    cmd: python src/train_and_tune.py
+    deps:
+      - src/train_and_tune.py
+      - data/staged/data.csv
+    outs:
+      - models/model.pkl
+      - models/best_params.json
+
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+      - src/evaluate.py
+      - data/staged/data.csv
+      - models/model.pkl
+    outs:
+      - models/metrics.json

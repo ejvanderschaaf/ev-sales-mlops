@@ -1,0 +1,57 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  full-pipeline-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - name: Configure DVC remote
+        run: dvc remote add -d myremote s3://ev-sales-mlops/dvc-store --force
+
+      - name: Pull data & run full DVC pipeline
+        run: |
+          dvc pull
+          dvc repro
+          dvc push
+
+      - name: Log in to Amazon ECR
+        run: |
+          aws ecr get-login-password --region us-east-2 | \
+            docker login --username AWS --password-stdin \
+            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-2.amazonaws.com
+
+      - name: Build & push Docker image to ECR
+        run: |
+          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-2.amazonaws.com/ev-sales-mlops:latest
+          docker build -t ev-sales-mlops .
+          docker tag ev-sales-mlops:latest $IMAGE_URI
+          docker push $IMAGE_URI
+
+      - name: Deploy / update SageMaker endpoint
+        run: python scripts/deploy_sagemaker.py
+        env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
