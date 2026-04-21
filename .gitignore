@@ -1,7 +1,11 @@
 # Data and model artifacts (tracked by DVC, not Git)
-data/raw/
-data/staged/
-models/
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/*.dvc
+data/staged/*
+!data/staged/.gitkeep
+models/*
+!models/.gitkeep
 
 # MLflow run logs
 mlruns/
