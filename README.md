@@ -39,7 +39,7 @@ ev-sales-mlops/
 
 Monthly EV market data across China, USA, Germany, UK, France, Norway, India, Netherlands (2019–2023). Combines brand-level sales (BYD, Tesla, VW), Google Trends search interest, charging infrastructure counts, and gasoline prices.
 
-Place the downloaded CSV at:
+Place the downloaded CSV (ev_market_master.csv) at:
 ```
 data/raw/ev_demand_dataset.csv
 ```
